@@ -36,7 +36,7 @@ def listVideos(url):
         for i in range(1,len(spl),1):
             entry=spl[i]
             match=re.compile('<li>(.+?)</li>', re.DOTALL).findall(entry)
-            length=match[0]
+            length=match[0].replace(" mins","")
             match=re.compile('<p class="video-description">\n                    <span class="publish-date">(.+?)</span> -(.+?)</p>', re.DOTALL).findall(entry)
             date=match[0][0]
             desc=match[0][1]
@@ -48,7 +48,7 @@ def listVideos(url):
             url=match[0]
             match=re.compile('src="(.+?)"', re.DOTALL).findall(entry)
             thumb=match[0]
-            addLink(title+" ("+length+")",url,'playVideo',thumb,date+"\n"+desc)
+            addLink(title,url,'playVideo',thumb,date+"\n"+desc,length)
         matchPage=re.compile('<a id="moreVideos" href="(.+?)"', re.DOTALL).findall(content)
         if len(matchPage)>0:
           urlNext="http://www.ign.com"+matchPage[0]
@@ -149,11 +149,11 @@ def parameters_string_to_dict(parameters):
                     paramDict[paramSplits[0]] = paramSplits[1]
         return paramDict
 
-def addLink(name,url,mode,iconimage,desc=""):
+def addLink(name,url,mode,iconimage,desc="",duration=""):
         u=sys.argv[0]+"?url="+urllib.quote_plus(url)+"&mode="+str(mode)
         ok=True
         liz=xbmcgui.ListItem(name, iconImage="DefaultVideo.png", thumbnailImage=iconimage)
-        liz.setInfo( type="Video", infoLabels={ "Title": name, "Plot": desc } )
+        liz.setInfo( type="Video", infoLabels={ "Title": name, "Plot": desc, "Duration": duration } )
         liz.setProperty('IsPlayable', 'true')
         ok=xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),url=u,listitem=liz)
         return ok
